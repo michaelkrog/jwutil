@@ -60,6 +60,11 @@
             <artifactId>validation</artifactId>
             <version>0.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.6.0</version>
+        </dependency>
     </dependencies>
     
     

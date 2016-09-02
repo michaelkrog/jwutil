@@ -1,4 +1,4 @@
-package dk.apaq.security;
+package dk.apaq.jwutil.common.security;
 
 /**
  * The security token.

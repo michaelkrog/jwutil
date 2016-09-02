@@ -1,6 +1,6 @@
-package dk.apaq.security;
+package dk.apaq.jwutil.common.security;
 
-import dk.apaq.util.Hashids;
+import dk.apaq.jwutil.common.util.Hashids;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

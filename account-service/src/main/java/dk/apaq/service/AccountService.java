@@ -11,7 +11,7 @@ import static dk.apaq.model.SecurityQuestionType.None;
 import dk.apaq.repository.AccountRepository;
 import dk.apaq.security.SecurityHelper;
 import dk.apaq.security.TokenGenerator;
-import dk.apaq.security.TokenProvider;
+import dk.apaq.jwutil.common.security.TokenProvider;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;

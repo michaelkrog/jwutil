@@ -1,4 +1,4 @@
-package dk.apaq.util;
+package dk.apaq.jwutil.common.util;
 
 import java.util.*;
 import java.util.regex.Matcher;

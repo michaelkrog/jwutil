@@ -1,0 +1,41 @@
+spring:
+    data.mongodb.uri: mongodb://localhost:27017/jwutil
+
+    messages:
+        basename: i18n/messages
+        cache-seconds: -1
+        encoding: UTF-8
+     
+
+recaptcha:
+    url: https://www.google.com/recaptcha/api/siteverify
+    secret: 6LfN9wYTAAAAANd_R_YucXAyAqc2NiLiSUzkQMkt
+
+skveege:
+    security:
+        salt: qwerty
+        model: dk.apaq.skveege.core.security.StandardSecurityModel
+        xauth:
+            secret: qwerty
+            tokenValidityInMinutes: 480
+        credentials: admin:admin:ADMIN,public:public:PUBLIC,secret:secret:SECRET,system:system:SYSTEM
+    
+        
+
+logging:
+    level: 
+        com:
+            previsto: DEBUG
+            previsto.core.service.osrm.Osrm: DEBUG
+            xena: DEBUG
+        org:
+            springframework:
+                web:
+                    client:
+                        RestTemplate: DEBUG
+        
+
+        
+management:
+    contextPath: /manage
+
