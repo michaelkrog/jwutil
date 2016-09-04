@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>dk.apaq</groupId>
+    <groupId>dk.apaq.orderly</groupId>
     <artifactId>account-service</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <parent>
-        <groupId>dk.apaq</groupId>
-        <artifactId>jwutil-service</artifactId>
+        <groupId>dk.apaq.orderly</groupId>
+        <artifactId>orderly-service-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../orderly-service-parent/pom.xml</relativePath>
     </parent>
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jwutil-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -28,16 +24,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
         </dependency>
-        <dependency>
-            <groupId>de.malkusch.validation</groupId>
-            <artifactId>validation</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.6.0</version>
-        </dependency>
+        
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

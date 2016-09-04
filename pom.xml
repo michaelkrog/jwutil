@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>dk.apaq</groupId>
-    <artifactId>jwutil</artifactId>
+    <groupId>dk.apaq.orderly</groupId>
+    <artifactId>orderly-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     
@@ -21,8 +21,8 @@
         <module>account-service</module>
         <module>broadcast-service</module>
         <module>unit-service</module>
-        <module>jwutil-common</module>
-        <module>jwutil-service</module>
+        <module>orderly-service-parent</module>
+        <module>orderly-common</module>
     </modules>
-
+    <name>orderly</name>
 </project>
