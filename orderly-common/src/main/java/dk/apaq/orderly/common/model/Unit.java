@@ -28,7 +28,6 @@ public class Unit extends BaseEntity implements HasAddress {
     @NotNull
     @Size(min = 2, max = 30)
     private String name;
-    private String url;
     @Size(min = 0, max = 50)
     private String address;
     @Size(min = 0, max = 15)
@@ -49,15 +48,13 @@ public class Unit extends BaseEntity implements HasAddress {
     @NotNull
     @Language
     private String languageCode;
-    @NotNull
-    @Currency
-    private String baseCurrency;
     private boolean locked;
-    private boolean subjectToVat;
     @NotNull
     @Size(min = 2, max = 2)
     private double[] location;
     
+    @NotNull
+    private UnitType unitType = UnitType.Congregation;
     
     private String timeZone;
     
@@ -67,14 +64,6 @@ public class Unit extends BaseEntity implements HasAddress {
 
     public Unit(String name) {
         this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getAddress() {
@@ -169,14 +158,6 @@ public class Unit extends BaseEntity implements HasAddress {
         this.languageCode = locale;
     }
 
-    public String getBaseCurrency() {
-        return baseCurrency;
-    }
-
-    public void setBaseCurrency(String baseCurrency) {
-        this.baseCurrency = baseCurrency;
-    }
-
     @JsonProperty
     public boolean isLocked() {
         return locked;
@@ -185,14 +166,6 @@ public class Unit extends BaseEntity implements HasAddress {
     @JsonIgnore
     public void setLocked(boolean locked) {
         this.locked = locked;
-    }
-
-    public boolean isSubjectToVat() {
-        return subjectToVat;
-    }
-
-    public void setSubjectToVat(boolean value) {
-        this.subjectToVat = value;
     }
 
     public String getTimeZone() {
@@ -211,6 +184,14 @@ public class Unit extends BaseEntity implements HasAddress {
         this.name = name;
     }
 
+    public UnitType getUnitType() {
+        return unitType;
+    }
+
+    public void setUnitType(UnitType unitType) {
+        this.unitType = unitType;
+    }
+    
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);

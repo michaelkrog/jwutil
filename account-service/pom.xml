@@ -12,18 +12,10 @@
         <relativePath>../orderly-service-parent/pom.xml</relativePath>
     </parent>
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
-        </dependency>
+        </dependency-->
         
     </dependencies>
     <properties>

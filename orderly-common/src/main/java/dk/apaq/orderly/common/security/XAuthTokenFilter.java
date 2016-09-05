@@ -28,12 +28,10 @@ public class XAuthTokenFilter extends GenericFilterBean {
     private static final Logger LOG = LoggerFactory.getLogger(XAuthTokenFilter.class);
     private static final String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
 
-    private final UserDetailsService detailsService;
     private final TokenParser tokenParser;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public XAuthTokenFilter(UserDetailsService detailsService, TokenParser tokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
-        this.detailsService = detailsService;
+    public XAuthTokenFilter(TokenParser tokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
         this.tokenParser = tokenProvider;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
@@ -51,13 +49,8 @@ public class XAuthTokenFilter extends GenericFilterBean {
                 if (this.tokenParser.validateToken(authToken)) {
                     UserDetails details = this.tokenParser.getUserDetailsFromToken(authToken);
                     
-                    /**
-                     * TODO: We should not load the user here, but other parts of the code extect the details to be an 
-                     * <code>AccountUserDetails</code> instance. When we seperate in microservice, then we should be able to not do this any more.
-                     **/
-                    details = detailsService.loadUserByUsername(details.getUsername());
-                    
-                    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(details, details.getPassword(), details.getAuthorities());
+                    JwtAuthenticationToken token = new JwtAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
+                    token.setAuthenticated(true);
                     SecurityContextHolder.getContext().setAuthentication(token);
                 } else {
                     throw new BadCredentialsException("The token used is invalid.");

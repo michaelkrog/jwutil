@@ -10,18 +10,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class XAuthTokenConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final TokenParser tokenParser;
-    private final UserDetailsService detailsService;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public XAuthTokenConfigurer(UserDetailsService detailsService, TokenParser tokenParser, AuthenticationEntryPoint authenticationEntryPoint) {
-        this.detailsService = detailsService;
+    public XAuthTokenConfigurer(TokenParser tokenParser, AuthenticationEntryPoint authenticationEntryPoint) {
         this.tokenParser = tokenParser;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        XAuthTokenFilter customFilter = new XAuthTokenFilter(detailsService, tokenParser, authenticationEntryPoint);
+        XAuthTokenFilter customFilter = new XAuthTokenFilter(tokenParser, authenticationEntryPoint);
         http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

@@ -1,4 +1,4 @@
-package dk.apaq.orderly.common.config;
+package dk.apaq.orderly.security;
 
 import javax.annotation.Resource;
 import dk.apaq.orderly.common.security.RestAuthenticationEntryPoint;
@@ -20,9 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
-public class AppConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AppConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebSecurityConfig.class);
     private static final String PROPERTY_NAME_SECURITY_CREDENTIALS = "skveege.security.credentials";
     
     private final AuthenticationEntryPoint authenticationEntryPoint = new RestAuthenticationEntryPoint();
@@ -55,11 +55,8 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                 .apply(securityConfigurerAdapter())
             .and()
                 .authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .and().authorizeRequests().antMatchers("/emails/**").permitAll()
-                .and().authorizeRequests().antMatchers("/usernames/**").permitAll()
                 .and().authorizeRequests().antMatchers(HttpMethod.POST, "/accounts").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/health").permitAll()
-                .and().authorizeRequests().antMatchers("/webhooks/**").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/info").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/**").hasRole("ADMIN")
                 .and().authorizeRequests().anyRequest().authenticated()
@@ -99,7 +96,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
     }
 
     private XAuthTokenConfigurer securityConfigurerAdapter() {
-      return new XAuthTokenConfigurer(userDetailsService, tokenParser, authenticationEntryPoint);
+      return new XAuthTokenConfigurer(tokenParser, authenticationEntryPoint);
     }
 
 }
