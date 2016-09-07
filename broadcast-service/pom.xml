@@ -11,6 +11,17 @@
         <relativePath>../orderly-service-parent/pom.xml</relativePath>
     </parent>
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.kurento</groupId>
+            <artifactId>kurento-client</artifactId>
+            <version>6.5.0</version>
+        </dependency>
+    </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
