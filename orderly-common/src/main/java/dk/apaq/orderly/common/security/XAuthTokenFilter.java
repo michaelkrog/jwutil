@@ -16,6 +16,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -27,7 +28,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 public class XAuthTokenFilter extends GenericFilterBean {
     private static final Logger LOG = LoggerFactory.getLogger(XAuthTokenFilter.class);
     private static final String XAUTH_TOKEN_HEADER_NAME = "x-auth-token";
-
+    private static final String WEBSOCKET_TOKEN_HEADER_NAME = "Sec-WebSocket-Protocol";
+    
     private final TokenParser tokenParser;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -43,25 +45,44 @@ public class XAuthTokenFilter extends GenericFilterBean {
         final HttpServletResponse response = (HttpServletResponse) res;
         
         try {
-            
-            String authToken = request.getHeader(XAUTH_TOKEN_HEADER_NAME);
-            if (StringUtils.hasText(authToken)) {
-                if (this.tokenParser.validateToken(authToken)) {
-                    UserDetails details = this.tokenParser.getUserDetailsFromToken(authToken);
-                    
-                    JwtAuthenticationToken token = new JwtAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
-                    token.setAuthenticated(true);
-                    SecurityContextHolder.getContext().setAuthentication(token);
-                } else {
-                    throw new BadCredentialsException("The token used is invalid.");
-                }
-            }
+            authenticateRequest(request);
             filterChain.doFilter(request, response);
         } catch (AuthenticationException ex) {
             SecurityContextHolder.clearContext();
 
             LOG.debug("Authentication request for failed: {}", ex);
             authenticationEntryPoint.commence(request, response, ex);
+        }
+    }
+
+    public void authenticateRequest(final HttpServletRequest request) throws BadCredentialsException {
+        XAuthTokenFilter.authenticateRequest(tokenParser, request);
+    }
+    
+    public static void authenticateRequest(TokenParser tokenParser, final HttpServletRequest request) throws BadCredentialsException {
+        String authToken = request.getHeader(XAUTH_TOKEN_HEADER_NAME);
+        if(authToken == null) {
+            authToken = request.getHeader(WEBSOCKET_TOKEN_HEADER_NAME);
+        }
+        authenticateToken(tokenParser, authToken);
+    }
+    
+    public static void authenticateRequest(TokenParser tokenParser, final ServerHttpRequest request) throws BadCredentialsException {
+        String authToken = request.getHeaders().getFirst(XAUTH_TOKEN_HEADER_NAME);
+        authenticateToken(tokenParser, authToken);
+    }
+    
+    public static void authenticateToken(TokenParser tokenParser, final String authToken) throws BadCredentialsException {
+        if (StringUtils.hasText(authToken)) {
+            if (tokenParser.validateToken(authToken)) {
+                UserDetails details = tokenParser.getUserDetailsFromToken(authToken);
+                
+                JwtAuthenticationToken token = new JwtAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
+                token.setAuthenticated(true);
+                SecurityContextHolder.getContext().setAuthentication(token);
+            } else {
+                throw new BadCredentialsException("The token used is invalid.");
+            }
         }
     }
 }

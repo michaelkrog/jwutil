@@ -32,6 +32,7 @@ public abstract class BaseWebSecurityConfig extends WebSecurityConfigurerAdapter
                 .and().authorizeRequests().antMatchers("/manage/health").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/info").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/**").hasRole("ADMIN")
+                .and().authorizeRequests().antMatchers("/call").permitAll()
                 .and().authorizeRequests().anyRequest().authenticated()
                 .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
                 .and().csrf().disable().headers().frameOptions().disable();

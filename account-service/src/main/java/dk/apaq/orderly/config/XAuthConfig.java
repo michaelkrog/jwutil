@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "skveege.security.xauth")
+@ConfigurationProperties(prefix = "orderly.security.xauth")
 public class XAuthConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(XAuthConfig.class);

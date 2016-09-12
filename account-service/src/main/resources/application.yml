@@ -13,7 +13,7 @@ recaptcha:
     url: https://www.google.com/recaptcha/api/siteverify
     secret: 6LfN9wYTAAAAANd_R_YucXAyAqc2NiLiSUzkQMkt
 
-skveege:
+orderly:
     security:
         salt: qwerty
         model: dk.apaq.skveege.core.security.StandardSecurityModel
