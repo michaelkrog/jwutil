@@ -17,6 +17,9 @@
 
 package dk.apaq.orderly;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.apaq.orderly.model.BroadcastMessage;
+import dk.apaq.orderly.model.BroadcastMessageResponse;
 import java.io.IOException;
 
 import org.kurento.client.IceCandidate;
@@ -26,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import com.google.gson.JsonObject;
 
 /**
  * User session.
@@ -40,18 +42,21 @@ public class UserSession {
 
   private final WebSocketSession session;
   private WebRtcEndpoint webRtcEndpoint;
+  private ObjectMapper objectMapper;
 
-  public UserSession(WebSocketSession session) {
+  public UserSession(WebSocketSession session, ObjectMapper objectMapper) {
+      
     this.session = session;
+    this.objectMapper = objectMapper;
   }
 
   public WebSocketSession getSession() {
     return session;
   }
 
-  public void sendMessage(JsonObject message) throws IOException {
+  public void sendMessage(BroadcastMessageResponse message) throws IOException {
     log.debug("Sending message from user with session Id '{}': {}", session.getId(), message);
-    session.sendMessage(new TextMessage(message.toString()));
+    session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
   }
 
   public WebRtcEndpoint getWebRtcEndpoint() {

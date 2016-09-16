@@ -13,7 +13,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 public abstract class BaseWebSecurityConfig extends WebSecurityConfigurerAdapter {
     
     private static final Logger LOG = LoggerFactory.getLogger(BaseWebSecurityConfig.class);
-    private final AuthenticationEntryPoint authenticationEntryPoint = new RestAuthenticationEntryPoint();
+    protected final AuthenticationEntryPoint authenticationEntryPoint = new RestAuthenticationEntryPoint();
     @Autowired
     private TokenParser tokenParser;
     
@@ -32,7 +32,6 @@ public abstract class BaseWebSecurityConfig extends WebSecurityConfigurerAdapter
                 .and().authorizeRequests().antMatchers("/manage/health").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/info").permitAll()
                 .and().authorizeRequests().antMatchers("/manage/**").hasRole("ADMIN")
-                .and().authorizeRequests().antMatchers("/call").permitAll()
                 .and().authorizeRequests().anyRequest().authenticated()
                 .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
                 .and().csrf().disable().headers().frameOptions().disable();

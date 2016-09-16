@@ -1,8 +1,9 @@
 package dk.apaq.orderly.config;
 
 import dk.apaq.orderly.CallHandler;
-import dk.apaq.orderly.CallHandler2;
+import dk.apaq.orderly.common.security.TokenParser;
 import org.kurento.client.KurentoClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class KurentoConfig {
 
     @Bean
-    public CallHandler2 callHandler() {
-        return new CallHandler2();
+    public CallHandler callHandler() {
+        return new CallHandler();
     }
 
     @Bean

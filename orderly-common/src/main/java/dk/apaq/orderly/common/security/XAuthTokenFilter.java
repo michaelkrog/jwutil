@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -59,30 +60,42 @@ public class XAuthTokenFilter extends GenericFilterBean {
         XAuthTokenFilter.authenticateRequest(tokenParser, request);
     }
     
-    public static void authenticateRequest(TokenParser tokenParser, final HttpServletRequest request) throws BadCredentialsException {
+    public static String authenticateRequest(TokenParser tokenParser, final HttpServletRequest request) throws BadCredentialsException {
         String authToken = request.getHeader(XAUTH_TOKEN_HEADER_NAME);
         if(authToken == null) {
             authToken = request.getHeader(WEBSOCKET_TOKEN_HEADER_NAME);
         }
-        authenticateToken(tokenParser, authToken);
+        authenticateTokenAndApply(tokenParser, authToken);
+        return authToken;
     }
     
-    public static void authenticateRequest(TokenParser tokenParser, final ServerHttpRequest request) throws BadCredentialsException {
+    public static String authenticateRequest(TokenParser tokenParser, final ServerHttpRequest request) throws BadCredentialsException {
         String authToken = request.getHeaders().getFirst(XAUTH_TOKEN_HEADER_NAME);
-        authenticateToken(tokenParser, authToken);
+        if(authToken == null) {
+            authToken = request.getHeaders().getFirst(WEBSOCKET_TOKEN_HEADER_NAME);
+        }
+        authenticateTokenAndApply(tokenParser, authToken);
+        return authToken;
     }
     
-    public static void authenticateToken(TokenParser tokenParser, final String authToken) throws BadCredentialsException {
+    public static void authenticateTokenAndApply(TokenParser tokenParser, final String authToken) throws BadCredentialsException {
+        Authentication auth = authenticateToken(tokenParser, authToken);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+    
+    public static Authentication authenticateToken(TokenParser tokenParser, final String authToken) throws BadCredentialsException {
         if (StringUtils.hasText(authToken)) {
             if (tokenParser.validateToken(authToken)) {
                 UserDetails details = tokenParser.getUserDetailsFromToken(authToken);
                 
                 JwtAuthenticationToken token = new JwtAuthenticationToken(details.getUsername(), details.getPassword(), details.getAuthorities());
                 token.setAuthenticated(true);
-                SecurityContextHolder.getContext().setAuthentication(token);
+                return token;
+                
             } else {
                 throw new BadCredentialsException("The token used is invalid.");
             }
         }
+        return null;
     }
 }

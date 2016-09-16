@@ -23,7 +23,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebSecurityConfig.class);
-    private static final String PROPERTY_NAME_SECURITY_CREDENTIALS = "skveege.security.credentials";
+    private static final String PROPERTY_NAME_SECURITY_CREDENTIALS = "orderly.security.credentials";
     
     private final AuthenticationEntryPoint authenticationEntryPoint = new RestAuthenticationEntryPoint();
 
