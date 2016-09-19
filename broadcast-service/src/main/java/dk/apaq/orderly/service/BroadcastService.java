@@ -10,24 +10,17 @@ import dk.apaq.orderly.model.JoinBroadcastMessage;
 import dk.apaq.orderly.model.OnIceCandidateEventListener;
 import dk.apaq.orderly.model.StartBroadcastMessage;
 import dk.apaq.orderly.repository.BroadcastRepository;
-import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-import org.kurento.client.EventListener;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
-import org.kurento.client.OnIceCandidateEvent;
 import org.kurento.client.WebRtcEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
 
 @Service
 public class BroadcastService extends BaseService<Broadcast, BroadcastRepository> {
@@ -94,6 +87,10 @@ public class BroadcastService extends BaseService<Broadcast, BroadcastRepository
 
     public void onIceCandidate(String unitId, IceCandidate iceCandidate, String sessionId) {
         WebRtcEndpoint endpoint = endpointMap.get(sessionId);
-        endpoint.addIceCandidate(iceCandidate.toOrg());
+        if(endpoint != null) {
+            LOG.debug("Endpoint not found for session:", sessionId);
+            endpoint.addIceCandidate(iceCandidate.toOrg());
+        }
+        
     }
 }

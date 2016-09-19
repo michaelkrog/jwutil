@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -17,6 +18,12 @@ public class MessageController {
     
     @Autowired
     private BroadcastService service;
+    
+    @MessageMapping("/session") 
+    @SendToUser
+    public String getSession(SimpMessageHeaderAccessor headerAccessor) {
+        return headerAccessor.getSessionId();
+    }
     
     @MessageMapping("/{unitId}/present") 
     public BroadcastMessageResponse handlePresenter(SimpMessageHeaderAccessor headerAccessor, @DestinationVariable String unitId, StartBroadcastMessage message, Principal p) {

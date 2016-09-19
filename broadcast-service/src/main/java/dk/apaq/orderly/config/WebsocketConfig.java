@@ -3,29 +3,33 @@ package dk.apaq.orderly.config;
 import dk.apaq.orderly.CallHandler;
 import dk.apaq.orderly.common.security.TokenParser;
 import dk.apaq.orderly.common.security.XAuthTokenFilter;
+import dk.apaq.orderly.model.BroadcastMessage;
+import dk.apaq.orderly.model.BroadcastMessageResponse;
+import dk.apaq.orderly.model.BroadcastMessageResponseType;
+import dk.apaq.orderly.model.BroadcastMessageType;
 import java.security.Principal;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.handler.invocation.HandlerMethodReturnValueHandler;
-import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.user.DefaultUserDestinationResolver;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.messaging.simp.user.UserDestinationResolver;
-import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -36,6 +40,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.messaging.DefaultSimpUserRegistry;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
@@ -43,14 +48,16 @@ import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebsocketConfig implements WebSocketMessageBrokerConfigurer, ApplicationListener<SessionConnectedEvent> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(WebsocketConfig.class);
+    
     private DefaultSimpUserRegistry userRegistry = new DefaultSimpUserRegistry();
     private DefaultUserDestinationResolver resolver = new DefaultUserDestinationResolver(userRegistry);
 
     @Autowired
-    private CallHandler callHandler;
-
+    private SimpMessageSendingOperations messagingTemplate;
+    
     @Autowired
     private TokenParser tokenParser;
 
@@ -74,6 +81,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/messages");
+        //registry.enableStompBrokerRelay("/events");
         registry.enableSimpleBroker("/events");
     }
 
@@ -152,6 +160,13 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.setInterceptors(new ChannelInterceptorAdapter() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                return super.preSend(message, channel); //To change body of generated methods, choose Tools | Templates.
+            }
+            
+        });
     }
 
     @Override
@@ -166,4 +181,17 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         return true;
     }
+
+    @Override
+    public void onApplicationEvent(SessionConnectedEvent event) {
+        LOG.debug(event.toString());
+        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(event.getMessage());
+        
+
+
+    }
+    
+    
+
+    
 }
