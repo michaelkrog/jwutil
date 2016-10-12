@@ -10,7 +10,6 @@ import dk.apaq.orderly.common.security.Roles;
 import dk.apaq.orderly.model.SecurityQuestionAnswer;
 import dk.apaq.orderly.model.SecurityQuestionInformation;
 import dk.apaq.orderly.model.SecurityQuestionRequest;
-import dk.apaq.orderly.common.security.SecurityHelper;
 import dk.apaq.orderly.service.AccountService;
 import dk.apaq.orderly.common.security.Token;
 import dk.apaq.orderly.security.TokenProvider;
@@ -41,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 @RestController
+@RequestMapping("/accounts")
 public class AccountController extends BaseController<Account, AccountService> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountController.class);
@@ -58,7 +58,7 @@ public class AccountController extends BaseController<Account, AccountService> {
     private TokenProvider tokenProvider;
     
 
-    @RequestMapping(value = "/accounts", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<List<Account>> list(WebRequest request) {
         LOG.debug("List Accounts request");
         
@@ -76,7 +76,7 @@ public class AccountController extends BaseController<Account, AccountService> {
         return handlePage(page);
     }
     
-    @RequestMapping(value = "/accounts/current/actions/password", method = {RequestMethod.POST})
+    @RequestMapping(value = "/current/actions/password", method = {RequestMethod.POST})
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Secured("ROLE_USER")
     public void changePassword(@RequestBody NewPasswordRequest newPasswordRequest) {
@@ -84,7 +84,7 @@ public class AccountController extends BaseController<Account, AccountService> {
         accountService.changePassword(newPasswordRequest.getCurrentPassword(), newPasswordRequest.getNewPassword());
     }
 
-    @RequestMapping(value = "/accounts/actions/authenticate", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/actions/authenticate", method = {RequestMethod.GET, RequestMethod.POST})
     @Secured("ROLE_USER")
     public Token authenticate() {
         LOG.debug("Authenticating user");
@@ -108,22 +108,7 @@ public class AccountController extends BaseController<Account, AccountService> {
         return tokenProvider.createToken(details);
     }
     
-    @RequestMapping(value = "/accounts", method = RequestMethod.POST)
-    public Account create(WebRequest request, @RequestBody Account account) {
-        return doCreate(account, request);
-    }
-    
-    @RequestMapping(value = "/accounts", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded")
-    public Account createViaForm(WebRequest request, @ModelAttribute Account account) {
-        return doCreate(account, request);
-    }
-    
-    @RequestMapping(value = "/accounts/{id}", method = RequestMethod.GET)
-    public Account get(@PathVariable String id) {
-        return checkResource(doGet(id));
-    }
-    
-    @RequestMapping(value = "/accounts/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
+    @RequestMapping(value = "/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
     public Account update(@RequestBody Account account, @PathVariable String id) {
         if(id.equals("current") && AccountContextHolder.getCurrent() != null) {
             id = AccountContextHolder.getCurrent().getId();
@@ -131,7 +116,7 @@ public class AccountController extends BaseController<Account, AccountService> {
         return doUpdate(id, account, treeNodePropertyReferenceConverter.translate(TreeNodeHolder.get()));
     }
     
-    @RequestMapping(value = "/accounts/{id}", method = {RequestMethod.PUT, RequestMethod.POST}, consumes = "application/x-www-form-urlencoded")
+    @RequestMapping(value = "/{id}", method = {RequestMethod.PUT, RequestMethod.POST}, consumes = "application/x-www-form-urlencoded")
     public Account updateViaForm(@PathVariable String id, @ModelAttribute Account account, HttpServletRequest request) {
         if(id.equals("current") && AccountContextHolder.getCurrent() != null) {
             id = AccountContextHolder.getCurrent().getId();
@@ -139,13 +124,7 @@ public class AccountController extends BaseController<Account, AccountService> {
         return doUpdate(id, account, formPropertyReferenceConverter.translate(request.getParameterMap()));
     }
     
-    @RequestMapping(value = "/accounts/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(value = HttpStatus.OK)
-    public void delete(@PathVariable String id) {
-        doDelete(id);
-    }
-    
-    @RequestMapping(value = "/accounts/retrieveSecurityQuestionType", method = RequestMethod.POST)
+    @RequestMapping(value = "/retrieveSecurityQuestionType", method = RequestMethod.POST)
     public SecurityQuestionInformation getQuestionType(WebRequest request, @RequestBody SecurityQuestionRequest questionRequest) {
         String recaptchaResponse = request.getHeader(PARAMETER_NAME_RECAPTCHA_RESPONSE);
         String remoteIp = request.getHeader(PARAMETER_NAME_REMOTE_IP);
@@ -159,14 +138,14 @@ public class AccountController extends BaseController<Account, AccountService> {
         return resetInformation;
     }
     
-    @RequestMapping(value = "/accounts/actions/password", method = RequestMethod.POST)
+    @RequestMapping(value = "/actions/password", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void regeneratePassword(@RequestBody SecurityQuestionAnswer answer) {
         accountService.regeneratePassword(answer.getAccountId(), answer.getAnswer(), answer.getNewPassword());
     }
     
     
-    @RequestMapping(value = "/accounts/{id}/validateEmail", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/validateEmail", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void emailValidation(@RequestParam(required = false) String token, @PathVariable String id) {
         LOG.debug("Email validation. [id={}; token={}]", id, token);

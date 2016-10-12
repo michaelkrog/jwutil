@@ -22,30 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 @RestController
+@RequestMapping("/units")
 public class UnitController extends BaseController<Unit, UnitService> {
     
     private static final Logger LOG = LoggerFactory.getLogger(UnitController.class);
     
-    @Autowired
-    private UnitService unitService;
-    
-    @RequestMapping(value = "/units", method = RequestMethod.GET)
-    public ResponseEntity<List<Unit>> list(WebRequest request) {
-        LOG.debug("List All Units request.");
-        return handlePage(unitService.findAll(resolvePageRequest(request)));
-    }
-    
-    @RequestMapping(value = "/units", method = RequestMethod.POST)
-    public Unit create(@RequestBody Unit unit) {
-        return doCreate(unit);
-    }
-    
-    @RequestMapping(value = "/units", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded")
-    public Unit createViaForm(@ModelAttribute Unit unit) {
-        return create(unit);
-    }
-    
-    @RequestMapping(value = "/units/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @Override
     public Unit get(@PathVariable String id) {
         if(id.equals("current")) {
             id = UnitIdHeaderFilter.getCurrentUnitId();
@@ -53,28 +36,14 @@ public class UnitController extends BaseController<Unit, UnitService> {
         return doGet(id);
     }
     
-    
-    @RequestMapping(value = "/units/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
+    @RequestMapping(value = "/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
+    @Override
     public Unit update(@RequestBody Unit unit, @PathVariable String id) {
         if(id.equals("current")) {
             id = UnitIdHeaderFilter.getCurrentUnitId();
         }
         return doUpdate(id, unit, treeNodePropertyReferenceConverter.translate(TreeNodeHolder.get()));
     }
-
-    @RequestMapping(value = "/units/{id}", method = {RequestMethod.PUT, RequestMethod.POST}, 
-            consumes = "application/x-www-form-urlencoded")
-    public Unit updateViaForm(@PathVariable String id, @ModelAttribute Unit unit, HttpServletRequest request) {
-        return doUpdate(id, unit, formPropertyReferenceConverter.translate(request.getParameterMap()));
-    }
-    
-    
-    @RequestMapping(value = "/units/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(value = HttpStatus.OK)
-    public void delete(@PathVariable String id) {
-        doDelete(id);
-    }
-    
     
     
 }

@@ -3,7 +3,6 @@ package dk.apaq.orderly.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.malkusch.validation.constraints.Country;
-import dk.apaq.orderly.common.validation.Currency;
 import dk.apaq.orderly.common.validation.Language;
 import dk.apaq.orderly.common.validation.Phonenumber;
 import java.time.LocalDate;

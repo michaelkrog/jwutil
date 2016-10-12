@@ -4,12 +4,14 @@ import dk.apaq.orderly.common.errors.InvalidArgumentException;
 import dk.apaq.orderly.common.errors.ResourceNotFoundException;
 import dk.apaq.orderly.common.filter.UnitIdHeaderFilter;
 import dk.apaq.orderly.common.model.BaseEntity;
+import dk.apaq.orderly.common.model.Unit;
 import dk.apaq.orderly.common.service.BaseService;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
 public class BaseController<T extends BaseEntity, S extends BaseService<T, ?>> {
@@ -36,6 +44,46 @@ public class BaseController<T extends BaseEntity, S extends BaseService<T, ?>> {
     @Autowired
     public void setService(S service) {
         this.service = service;
+    }
+    
+    @RequestMapping(value = "" , method = RequestMethod.GET)
+    public ResponseEntity<List<T>> list(WebRequest request) {
+        LOG.debug("List All entities request.");
+        return handlePage(service.findAll(resolvePageRequest(request)));
+    }
+    
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public T create(@RequestBody T entity) {
+        return doCreate(entity);
+    }
+    
+    @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded")
+    public T createViaForm(@ModelAttribute T entity) {
+        return create(entity);
+    }
+    
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public T get(@PathVariable String id) {
+        return checkResource(doGet(id));
+    }
+    
+    
+    @RequestMapping(value = "/{id}", method = {RequestMethod.PUT, RequestMethod.POST})
+    public T update(@RequestBody T entity, @PathVariable String id) {
+        return doUpdate(id, entity, treeNodePropertyReferenceConverter.translate(TreeNodeHolder.get()));
+    }
+
+    @RequestMapping(value = "/{id}", method = {RequestMethod.PUT, RequestMethod.POST}, 
+            consumes = "application/x-www-form-urlencoded")
+    public T updateViaForm(@PathVariable String id, @ModelAttribute T entity, HttpServletRequest request) {
+        return doUpdate(id, entity, formPropertyReferenceConverter.translate(request.getParameterMap()));
+    }
+    
+    
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void delete(@PathVariable String id) {
+        doDelete(id);
     }
     
     protected Filter resolveFiltering(WebRequest request) {
@@ -140,27 +188,22 @@ public class BaseController<T extends BaseEntity, S extends BaseService<T, ?>> {
         return currentOrganizationId;
     }
     
-    public T doCreate(T entity) {
+    protected T doCreate(T entity) {
         LOG.debug("Create request [entity={}]", entity);
         entity.setId(null); // Make sure that the account is a new account
         return service.save(entity);
     }
     
-    /*public T doCreateViaForm(T entity, Map<String, String[]> map) {
-        applyModel(entity, map);
-        return doCreate(entity);
-    }*/
-    
-    public T doGet(String id) {
+    protected T doGet(String id) {
         LOG.debug("Retrieved GET request for specific instance [id={}]", id);
         return checkResource(service.findOne(id));
     }
 
-    public T doUpdate(String id, T entity, Iterable<String> dirtyFields) {
+    protected T doUpdate(String id, T entity, Iterable<String> dirtyFields) {
         return doUpdate(id, entity, dirtyFields, (List<String>)Collections.EMPTY_LIST);
     }
     
-    public T doUpdate(String id, T entity, Iterable<String> dirtyFields, List<String> ignoredFields) {
+    protected T doUpdate(String id, T entity, Iterable<String> dirtyFields, List<String> ignoredFields) {
         LOG.debug("Update request [id={};entity={}]", id, entity);
         
         entity = mergeEntities(service.findOne(id), entity, dirtyFields, ignoredFields);
@@ -169,7 +212,7 @@ public class BaseController<T extends BaseEntity, S extends BaseService<T, ?>> {
         return service.save(entity);
     }
     
-    public void doDelete(String id) {
+    protected void doDelete(String id) {
         LOG.debug("Delete request [id={}]", id);
         T entity = service.findOne(id);
         service.delete(entity);
